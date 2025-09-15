@@ -1,81 +1,112 @@
-# Turborepo starter
+# ScaleChat — Scalable Real-Time Chat Platform
 
-This is an official starter Turborepo.
+> A horizontally-scalable real-time chat application using **Socket.IO + Redis (Pub/Sub)** for low-latency fanout and **Kafka → consumer → PostgreSQL** for durable ingestion.  
+> Built as a Turborepo monorepo with a Next.js frontend and a TypeScript Node.js backend.
 
-## Using this example
+---
 
-Run the following command:
+## Features
 
-```sh
-npx create-turbo@latest
-```
+- Cross-server real-time messaging (no siloed connections).  
+- Kafka-backed durable ingestion pipeline.  
+- Prisma-based message schema and migrations.  
+- Reference `SocketService` (Socket.IO + Redis) and Kafka producer/consumer examples.  
+- Patterns and code sketches for rooms, sharding, and per-room ordering.  
 
-## What's inside?
+---
 
-This Turborepo includes the following packages/apps:
+## Requirements
 
-### Apps and Packages
+You’ll need the following installed on your system:
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### System dependencies
+- **Node.js v18+** (recommended)  
+  - macOS (Homebrew + nvm):  
+    ```bash
+    brew install nvm
+    nvm install 18
+    nvm use 18
+    ```
+  - Ubuntu/Debian:  
+    ```bash
+    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+    ```
+- **Yarn** (preferred package manager)  
+  - macOS: `brew install yarn`  
+  - Ubuntu: `npm install -g yarn`  
+  - Or enable via Corepack:  
+    ```bash
+    corepack enable
+    corepack prepare yarn@stable --activate
+    ```
+- **Git**  
+  - macOS: `brew install git`  
+  - Ubuntu: `sudo apt-get install -y git`
+- **Docker & Docker Compose** (recommended for running Redis, Kafka, Postgres locally)  
+  - Install Docker Desktop (macOS/Windows) or Docker Engine + docker-compose-plugin (Linux).  
+  - Verify installation:  
+    ```bash
+    docker --version
+    docker compose version
+    ```
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### Project dependencies (installed automatically by Yarn)
+When you run `yarn` in the repo root, it will install all workspaces’ dependencies:
+- `socket.io` / `socket.io-client`
+- `ioredis`
+- `kafkajs`
+- `prisma` & `@prisma/client`
+- `typescript`, `ts-node`, `tsc-watch`
+- `next`, `react`, `react-dom`
 
-### Utilities
+### Optional tools
+- **Redis Insights** (GUI for Redis monitoring)  
+- **pgAdmin / psql** (Postgres admin tools)  
+- **kcat / kafkacat** (Kafka CLI for topic testing)
 
-This Turborepo has some additional tools already setup for you:
+---
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+## Quickstart (Local)
 
-### Build
+### Option A — Local without Docker (requires external infra)
 
-To build all apps and packages, run the following command:
+If you already have Redis, Kafka, and Postgres available (e.g., via **Aiven** or **DigitalOcean Managed Services**):
 
-```
-cd my-turborepo
-pnpm build
-```
+1. **Clone the repo**
+   ```bash
+   git clone https://github.com/piyushgarg-dev/Scaleable-WebSockets.git
+   cd Scaleable-WebSockets
+2.**Install the dependencies**
+3. **Set up your Environment variables**
+   Create apps/server/.env using your managed service credentials.
+   Update .env
+   PORT=8000
 
-### Develop
+# Redis
+REDIS_HOST=redis-YOURHOST.aivencloud.com
+REDIS_PORT=12345
+REDIS_USERNAME=default
+REDIS_PASSWORD=YOURPASSWORD
 
-To develop all apps and packages, run the following command:
+# Kafka
+KAFKA_BROKERS=kafka-YOURHOST.aivencloud.com:12345
+KAFKA_USERNAME=YOURUSER
+KAFKA_PASSWORD=YOURPASSWORD
+KAFKA_SASL_MECHANISM=plain
+KAFKA_CA_PATH=./ca.pem
 
-```
-cd my-turborepo
-pnpm dev
-```
+# Postgres
+DATABASE_URL=postgresql://USER:PASSWORD@pg-YOURHOST.aivencloud.com:12345/scalechat?schema=public
 
-### Remote Caching
+4.**Run Prisma migrations**
+yarn workspace server prisma generate
+yarn workspace server prisma migrate dev --name init
 
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+5.**Start apps**
+# server
+yarn workspace server dev
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
+# web (Next.js frontend)
+yarn workspace web dev
 
-```
-cd my-turborepo
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
