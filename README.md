@@ -1,4 +1,4 @@
-# ScaleChat — Scalable Real-Time Chat Platform
+# RealScaleChat — Scalable Real-Time Chat Platform
 
 > A horizontally-scalable real-time chat application using **Socket.IO + Redis (Pub/Sub)** for low-latency fanout and **Kafka → consumer → PostgreSQL** for durable ingestion.  
 > Built as a Turborepo monorepo with a Next.js frontend and a TypeScript Node.js backend.
